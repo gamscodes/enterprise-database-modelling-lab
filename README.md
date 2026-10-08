@@ -1,4 +1,4 @@
-Enterprise Database Modelling & Schema Governance Lab
+#Enterprise Database Modelling & Schema Governance Lab
 Project Overview
 
 This project demonstrates the design and implementation of an enterprise relational database for a fictional Ontario Citizen Licensing & Permit Management Platform.
