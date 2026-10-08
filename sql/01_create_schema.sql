@@ -1,1 +1,17 @@
+-- ============================================================
+-- Enterprise Citizen Licensing & Permit Management Platform
+-- Database Schema
+-- PostgreSQL
+-- ============================================================
 
+-- Purpose:
+-- This script defines the relational database structure for
+-- the Citizen Licensing & Permit Management Platform.
+--
+-- Design principles:
+--   1. Consistent snake_case naming
+--   2. Explicit primary and foreign keys
+--   3. Strong data integrity constraints
+--   4. Appropriate PostgreSQL data types
+--   5. Normalized relational design
+-- ============================================================
