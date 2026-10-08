@@ -298,3 +298,156 @@ Examples include:
 * Reviewer workload
 * Approval and rejection rates
 * Payment activity
+
+## 7. Non-Functional Requirements
+
+The following non-functional requirements define the expected technical qualities of the simulated database environment.
+
+### NFR-01 — Data Integrity
+
+The database shall maintain accurate and consistent data through appropriate database constraints and validation rules.
+
+The design shall use:
+
+* Primary keys
+* Foreign keys
+* NOT NULL constraints
+* UNIQUE constraints
+* CHECK constraints
+* Appropriate data types
+
+Business rules that can be reliably enforced at the database level should not depend solely on application-level validation.
+
+### NFR-02 — Performance
+
+The database shall support efficient execution of frequently used application and reporting queries.
+
+The design shall consider:
+
+* Appropriate indexing
+* Query access patterns
+* Join performance
+* Filtering and sorting requirements
+* Index maintenance overhead
+* Growth in data volume
+
+Indexes shall be created based on documented query and workload requirements rather than being added indiscriminately.
+
+### NFR-03 — Scalability
+
+The database design shall support growth in:
+
+* Citizens
+* Applications
+* Documents
+* Payments
+* Status history records
+* Audit records
+
+The logical model should allow the platform to scale without requiring fundamental changes to core business relationships.
+
+### NFR-04 — Security
+
+Database access shall follow the principle of least privilege.
+
+The design shall consider:
+
+* Role-based access
+* Separation of responsibilities
+* Controlled access to sensitive information
+* Authentication and authorization
+* Service account usage
+* Auditability of privileged activities
+
+Detailed role-based access control implementation will be addressed in a future portfolio project.
+
+### NFR-05 — Availability and Reliability
+
+The database should be designed with reliability and operational continuity in mind.
+
+The architecture should support future implementation of:
+
+* Backup strategies
+* Recovery procedures
+* Disaster recovery
+* Monitoring
+* Availability controls
+
+Detailed backup and recovery implementation will be addressed in a future portfolio project.
+
+### NFR-06 — Maintainability
+
+Database objects shall follow consistent and documented standards.
+
+The database shall use:
+
+* Consistent naming conventions
+* Clearly defined relationships
+* Documented constraints
+* Documented indexes
+* Structured SQL scripts
+* Version-controlled database changes
+
+### NFR-07 — Auditability
+
+Important business and administrative activities shall be traceable.
+
+The database shall support the ability to determine:
+
+* Who performed an action
+* What action occurred
+* Which record was affected
+* When the action occurred
+
+### NFR-08 — Governance
+
+Database structures and changes shall follow documented technical standards.
+
+Governance shall address:
+
+* Naming conventions
+* Data types
+* Primary and foreign key standards
+* Constraint standards
+* Indexing standards
+* Documentation requirements
+* Change management
+* Data integrity practices
+
+### NFR-09 — Compatibility
+
+The database design shall use standard relational database concepts and PostgreSQL-supported functionality.
+
+The design should avoid unnecessary vendor-specific complexity unless there is a documented technical reason for its use.
+
+### NFR-10 — Observability
+
+The database environment should provide sufficient information to support troubleshooting and operational analysis.
+
+Future implementations should consider:
+
+* Database performance metrics
+* Query execution analysis
+* Audit information
+* Error monitoring
+* Resource utilization
+* Operational logging
+
+### NFR-11 — Extensibility
+
+The database design should allow additional licence and permit types, application statuses, document types, roles, and reporting requirements to be introduced without unnecessary structural changes.
+
+Reference and configuration data should be separated from transactional data where appropriate.
+
+### NFR-12 — Documentation
+
+The database design shall be documented sufficiently for application developers, database administrators, and technical stakeholders to understand:
+
+* Business entities
+* Relationships
+* Data definitions
+* Constraints
+* Indexes
+* Design decisions
+* Governance standards
+* Usage considerations
