@@ -1,80 +1,110 @@
-#Enterprise Database Modelling & Schema Governance Lab
-Project Overview
+# Enterprise Database Modelling & Schema Governance Lab
 
-This project demonstrates the design and implementation of an enterprise relational database for a fictional Ontario Citizen Licensing & Permit Management Platform.
+[![Database](https://img.shields.io/badge/Database-PostgreSQL-336791?style=flat-square&logo=postgresql&logoColor=white)](#technology-stack)
+[![Language](https://img.shields.io/badge/Language-SQL-003B57?style=flat-square&logo=sqlite&logoColor=white)](#technology-stack)
+[![Modelling Tool](https://img.shields.io/badge/Modelling-dbdiagram.io-4A90E2?style=flat-square)](#technology-stack)
+[![Platform](https://img.shields.io/badge/Platform-GitHub-181717?style=flat-square&logo=github&logoColor=white)](#technology-stack)
 
-The platform is designed to support the complete lifecycle of government licence and permit applications, including citizen management, application submission, document management, application review, approval decisions, payments, user access, status tracking, and auditability.
+## Project Overview
 
-Objectives
+This project demonstrates the end-to-end design and implementation of an enterprise relational database for a fictional **Ontario Citizen Licensing & Permit Management Platform**.
 
-This project demonstrates practical experience in:
+The platform supports the complete lifecycle of government licence and permit applications, including:
 
-Enterprise relational database design
-Data modelling and normalization
-Database schema design and implementation
-Data integrity and validation
-Database standards and governance
-Indexing and performance considerations
-Technical documentation
-Developer consultation and database best practices
-Security and auditability considerations
-Technology
-PostgreSQL
-SQL
-dbdiagram.io
-GitHub
-Business Scenario
+- Citizen management and profile administration
+- Application submission and status tracking
+- Document management and supporting artifact attachment
+- Review and approval decisions by designated officials
+- Payment tracking and financial records
+- Access control and user role management
+- Auditability and logging for compliance and oversight
 
-The fictional platform provides a centralized database for managing citizen licence and permit applications throughout their lifecycle.
+---
 
-The database is designed to support citizens, application reviewers, approvers, system administrators, application developers, and database administrators.
+## Project Objectives
 
-Project Scope
+This lab demonstrates practical experience across key database engineering and governance domains:
 
-The database will support:
+- Enterprise relational database design
+- Data modelling and normalization up to 3NF/BCNF
+- Database schema design and implementation
+- Data integrity and validation rules
+- Database standards and governance
+- Indexing and performance considerations
+- Technical documentation and data dictionary creation
+- Developer consultation and database best practices
+- Security, role access, and auditability considerations
 
-Citizen and profile management
-Licence and permit type management
-Application submission and tracking
-Application status history
-Supporting document management
-Application review and approval
-Payment tracking
-User and role management
-Audit logging
-Operational reporting
-Project Deliverables
+---
 
-The completed project will include:
+## Technology Stack
 
-Entity-Relationship Diagram (ERD)
-Relational database schema
-PostgreSQL SQL scripts
-Data dictionary
-Business rules
-Database governance and standards guide
-Indexing strategy
-Data integrity testing
-Developer database guidance
-Sample business queries
-Architecture and Design Approach
+| Component | Technology |
+|---|---|
+| Database Engine | PostgreSQL |
+| Query Language | SQL (DDL, DML, DCL) |
+| Data Modelling | dbdiagram.io |
+| Version Control | GitHub |
 
-The database will be designed using a normalized relational model with clearly defined primary keys, foreign keys, constraints, and relationships.
+---
 
-Database design decisions will be documented to support maintainability, data integrity, performance, security, and consistent development practices.
+## Business Scenario
 
-Portfolio Purpose
+The platform provides a centralized, single source of truth for managing citizen licence and permit applications throughout their lifecycle.
 
-This project is a hands-on portfolio exercise designed to demonstrate practical database design, modelling, governance, analytical problem-solving, and technical communication skills through an enterprise-style scenario.
+The architecture supports multiple operational personas:
 
-Future Enhancements
+- **Citizens** — Submit applications and check application status
+- **Application Reviewers and Approvers** — Verify documentation and make determination decisions
+- **System Administrators** — Manage roles, security, and reference data
+- **Application Developers and DBAs** — Develop efficient queries, maintain schema integrity, and manage database performance
 
-Future projects will extend this environment to demonstrate:
+---
 
-Query performance analysis and optimization
-Execution plan analysis
-Role-based access control
-Database partitioning
-Backup and recovery strategies
-Operational monitoring
-Enterprise database administration practices
+## Project Scope
+
+The database supports the following core functional areas:
+
+- Citizen and profile management
+- Licence and permit management
+- Application submission and lifecycle tracking
+- Application status management
+- Supporting document management
+- Application review and approval workflows
+- Payment and transaction tracking
+- User and role-based access control
+- Audit logging and compliance tracking
+- Reference and lookup data management
+- Database integrity and validation
+- Query performance and indexing
+- Database documentation and governance
+
+---
+
+## Project Structure
+
+The project will be organized into the following areas:
+
+```text
+enterprise-database-lab/
+│
+├── README.md
+│
+├── docs/
+│   ├── business-requirements.md
+│   ├── data-dictionary.md
+│   └── governance-standards.md
+│
+├── database/
+│   ├── 01_schema/
+│   ├── 02_tables/
+│   ├── 03_constraints/
+│   ├── 04_indexes/
+│   ├── 05_seed_data/
+│   └── 06_queries/
+│
+├── modelling/
+│   └── erd/
+│
+└── tests/
+    └── validation/
