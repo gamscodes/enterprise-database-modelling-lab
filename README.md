@@ -108,3 +108,19 @@ enterprise-database-lab/
 │
 └── tests/
     └── validation/
+
+
+## Query Performance Analysis
+
+Used PostgreSQL `EXPLAIN (ANALYZE, BUFFERS)` to inspect the execution plan for the application summary report.
+
+Key observations:
+- The query returned all 3 sample applications.
+- Measured execution time was 0.173 ms on the demonstration dataset.
+- PostgreSQL used hash joins to combine related tables.
+- Payment totals and document counts were aggregated separately to avoid inflated totals when multiple related records exist.
+- Sequential scans were selected for the small sample tables, which is reasonable for this dataset.
+- Existing primary-key, unique-constraint, and supporting indexes were inspected before considering additional indexes.
+
+**Limitation:** The dataset is small and synthetic. The measured execution time is a baseline observation, not evidence of performance at production scale. Larger representative datasets and repeatable benchmarks would be needed to evaluate scalability.
+
