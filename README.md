@@ -42,7 +42,7 @@ This lab demonstrates practical experience across key database engineering and g
 | Component | Technology |
 |---|---|
 | Database Engine | PostgreSQL |
-| Query Language | SQL (DDL, DML, DCL) |
+| Query Language | SQL (DDL, DML) |
 | Data Modelling | dbdiagram.io |
 | Version Control | GitHub |
 
