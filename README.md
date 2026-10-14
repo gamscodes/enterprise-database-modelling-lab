@@ -54,10 +54,10 @@ The platform provides a centralized, single source of truth for managing citizen
 
 The architecture supports multiple operational personas:
 
-- **Citizens** — Submit applications and check application status
-- **Application Reviewers and Approvers** — Verify documentation and make determination decisions
-- **System Administrators** — Manage roles, security, and reference data
-- **Application Developers and DBAs** — Develop efficient queries, maintain schema integrity, and manage database performance
+- **Citizens** - Submit applications and check application status
+- **Application Reviewers and Approvers** - Verify documentation and make determination decisions
+- **System Administrators** - Manage roles, security, and reference data
+- **Application Developers and DBAs** - Develop efficient queries, maintain schema integrity, and manage database performance
 
 ---
 
@@ -104,7 +104,6 @@ enterprise-database-modelling-lab/
         ├── enterprise-data-model.dbml
         ├── Enterprise Citizen Licensing Database.pdf
         ├── Enterprise Citizen Licensing Database.png
-        └── README.md
 ```
 ---
 
@@ -149,9 +148,7 @@ Used PostgreSQL `EXPLAIN (ANALYZE, BUFFERS)` to inspect the execution plan for t
 
 - The dataset is small and synthetic. The measured execution time is a baseline observation, not evidence of performance at production scale. Larger representative datasets and repeatable benchmarks would be needed to evaluate scalability.
 
-
 ---
-
 
 ## Fresh Database Validation
 
