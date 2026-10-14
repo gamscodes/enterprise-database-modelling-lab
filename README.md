@@ -83,24 +83,28 @@ The database supports the following core functional areas:
 
 ## Project Structure
 
-The project is organized into documentation, SQL scripts, and database modelling resources.
-
 ```text
-enterprise-database-lab/
+enterprise-database-modelling-lab/
 ├── README.md
 ├── docs/
 │   ├── business-requirements.md
 │   ├── business-rules.md
 │   ├── data-model-notes.md
 │   ├── database-governance-standards.md
+│   ├── data-dictionary.md
 │   ├── relationship-validation.md
-│   └── schema-validation.md
+│   ├── schema-validation.md
+│   └── schema-change-management.md
 ├── sql/
 │   ├── 01_create_schema.sql
 │   ├── 02_seed_sample_data.sql
 │   └── 03_reporting_queries.sql
 └── modelling/
     └── erd/
+        ├── enterprise-data-model.dbml
+        ├── Enterprise Citizen Licensing Database.pdf
+        ├── Enterprise Citizen Licensing Database.png
+        └── README.md
 ```
 ---
 
