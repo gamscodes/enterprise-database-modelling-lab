@@ -138,25 +138,25 @@ They may require reports relating to:
 
 The following functional requirements define what the simulated platform must be able to support.
 
-### FR-01 — Citizen Management
+### FR-01 - Citizen Management
 
 The system shall maintain a unique record for each citizen.
 
 The citizen record should contain the information required to identify and contact the citizen within the scope of the simulated platform.
 
-### FR-02 — Citizen Profile Management
+### FR-02 - Citizen Profile Management
 
 The system shall allow citizen profile information to be maintained separately from core citizen identification information where appropriate.
 
 Profile information may include contact and address information.
 
-### FR-03 — Licence and Permit Types
+### FR-03 - Licence and Permit Types
 
 The system shall maintain a controlled list of available licence and permit types.
 
 Each type should include information such as its name, description, applicable fee, and active/inactive status.
 
-### FR-04 — Application Submission
+### FR-04 - Application Submission
 
 The system shall allow a citizen to submit multiple licence or permit applications.
 
@@ -164,10 +164,12 @@ Each application shall be associated with:
 
 * One citizen
 * One application type
-* A submission date
+* A submission date, when the application has been submitted
 * A current application status
 
-### FR-05 — Application Status Management
+Draft applications may have a NULL submission date until they are submitted.
+
+### FR-05 - Application Status Management
 
 The system shall maintain the current status of each application.
 
@@ -182,7 +184,7 @@ Example statuses may include:
 * Withdrawn
 * Completed
 
-### FR-06 — Application Status History
+### FR-06 - Application Status History
 
 The system shall retain the historical status changes for each application.
 
@@ -196,19 +198,22 @@ Each status history record should identify:
 
 The system shall retain historical status information rather than overwriting previous status changes.
 
-### FR-07 — Supporting Document Management
+### FR-07 - Supporting Document Management
 
-The system shall allow applications to have supporting documents.
+The system shall allow applications to be associated with supporting documents.
 
-The system should maintain document metadata such as:
+The database shall maintain document metadata such as:
 
 * Document type
 * File name
 * Upload date
 * Document status
 * Application association
+* File reference or storage location, where applicable
 
-### FR-08 — Application Review
+The database design focuses on document metadata and relationships. The storage of actual file contents may be handled by a separate file storage service or repository and is outside the scope of this portfolio project's current database implementation.
+
+### FR-08 - Application Review
 
 The system shall support the review of submitted applications by authorized users.
 
@@ -220,7 +225,7 @@ Review activities should allow reviewers to:
 * Request additional information
 * Record review outcomes
 
-### FR-09 — Approval Decisions
+### FR-09 - Approval Decisions
 
 The system shall support approval and rejection decisions for applications.
 
@@ -232,7 +237,7 @@ Each decision should record:
 * Decision date
 * Comments
 
-### FR-10 — Payment Management
+### FR-10 - Payment Management
 
 The system shall support payment records for applications where a fee is required.
 
@@ -244,13 +249,13 @@ Payment information should include:
 * Payment status
 * Payment reference
 
-### FR-11 — User Management
+### FR-11 - User Management
 
 The system shall maintain authorized users who interact with the simulated platform.
 
 User records should support identification and account status information.
 
-### FR-12 — Role Management
+### FR-12 - Role Management
 
 The system shall support role-based access concepts.
 
@@ -261,7 +266,7 @@ Users may be assigned one or more roles, such as:
 * System Administrator
 * Reporting User
 
-### FR-13 — Audit Logging
+### FR-13 - Audit Logging
 
 The system shall maintain audit records for important system activities.
 
@@ -272,7 +277,7 @@ Audit records should allow authorized users to determine:
 * Which record was affected
 * When the action occurred
 
-### FR-14 — Application Search and Filtering
+### FR-14 - Application Search and Filtering
 
 The system shall support common application search and filtering requirements.
 
@@ -283,9 +288,11 @@ Users should be able to locate applications using criteria such as:
 * Application type
 * Application status
 * Submission date
-* Assigned reviewer
+* Reviewer associated with the application's review records
 
-### FR-15 — Operational Reporting
+The current database design records reviewers through application review records. A dedicated reviewer assignment workflow may be introduced in a future enhancement if required.
+
+### FR-15 - Operational Reporting
 
 The database shall support information required for operational and management reporting.
 
