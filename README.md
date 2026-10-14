@@ -81,14 +81,13 @@ The database supports the following core functional areas:
 
 ---
 
-Project Structure
+## Project Structure
 
-The project is organized into documentation, SQL scripts, data modelling, and validation resources.
+The project is organized into documentation, SQL scripts, and database modelling resources.
 
+```text
 enterprise-database-lab/
-│
 ├── README.md
-│
 ├── docs/
 │   ├── business-requirements.md
 │   ├── business-rules.md
@@ -96,24 +95,31 @@ enterprise-database-lab/
 │   ├── database-governance-standards.md
 │   ├── relationship-validation.md
 │   └── schema-validation.md
-│
 ├── sql/
 │   ├── 01_create_schema.sql
 │   ├── 02_seed_sample_data.sql
 │   └── 03_reporting_queries.sql
-│
 └── modelling/
     └── erd/
+```
+---
 
-Query Performance Analysis
+## Query Performance Analysis
 
-Used PostgreSQL EXPLAIN (ANALYZE, BUFFERS) to inspect the execution plan for the application summary report.
+Used PostgreSQL `EXPLAIN (ANALYZE, BUFFERS)` to inspect the execution plan for the application summary report.
 
-Key Observations
+### Key Observations
 
-The query returned all 3 sample applications.
+- The query returned **all 3 sample applications**.
+- Measured execution time was **0.173 ms** on the demonstration dataset.
+- PostgreSQL used **hash joins** to combine related tables.
+- Payment totals and document counts were aggregated separately to prevent inflated totals when multiple related records exist.
+- PostgreSQL selected **sequential scans** for the small sample tables, which is reasonable for this dataset.
+- Existing primary-key, unique-constraint, and supporting indexes were inspected before considering additional indexes.
 
-Measured execution time was 0.173 ms on the demonstration dataset.
+### Limitations
+
+The dataset is small and synthetic. The measured execution time is a baseline observation, not evidence of performance at production scale. Larger representative datasets and repeatable benchmarks would be needed to evaluate scalability.
 
 PostgreSQL used hash joins to combine related tables.
 
