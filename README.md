@@ -32,7 +32,7 @@ This lab demonstrates practical experience across key database engineering and g
 - Database standards and governance
 - Indexing and performance considerations
 - Technical documentation and data dictionary creation
-- Developer consultation and database best practices
+- Database design standards and technical documentation
 - Security, role access, and auditability considerations
 
 ---
