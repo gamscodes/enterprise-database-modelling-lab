@@ -242,21 +242,29 @@ WHERE a.application_number = 'APP-2026-0002';
 -- 13. PAYMENTS
 -- =========================================================
 
+
 INSERT INTO payments (
-    application_id, payment_reference, amount, payment_status
+    application_id, payment_reference, amount, payment_status, paid_at
 )
 SELECT a.application_id,
        payment.payment_reference,
        payment.amount,
-       payment.payment_status
+       payment.payment_status,
+       payment.paid_at
 FROM (
     VALUES
-        ('APP-2026-0001', 'DEMO-PAY-001', 150.00, 'PAID'),
-        ('APP-2026-0002', 'DEMO-PAY-002', 50.00,  'PAID'),
-        ('APP-2026-0003', 'DEMO-PAY-003', 100.00, 'PENDING')
-) AS payment(application_number, payment_reference, amount, payment_status)
+        ('APP-2026-0001', 'DEMO-PAY-001', 150.00, 'PAID',
+         TIMESTAMP '2026-10-01 09:30:00'),
+        ('APP-2026-0002', 'DEMO-PAY-002', 50.00, 'PAID',
+         TIMESTAMP '2026-10-03 11:45:00'),
+        ('APP-2026-0003', 'DEMO-PAY-003', 100.00, 'PENDING',
+         NULL::timestamp)
+) AS payment(
+    application_number, payment_reference, amount, payment_status, paid_at
+)
 JOIN applications a
     ON a.application_number = payment.application_number;
+
 
 -- =========================================================
 -- 14. AUDIT LOGS
