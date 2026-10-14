@@ -81,46 +81,48 @@ The database supports the following core functional areas:
 
 ---
 
-## Project Structure
+Project Structure
 
-The project will be organized into the following areas:
+The project is organized into documentation, SQL scripts, data modelling, and validation resources.
 
-```text
 enterprise-database-lab/
 │
 ├── README.md
 │
 ├── docs/
 │   ├── business-requirements.md
-│   ├── data-dictionary.md
-│   └── governance-standards.md
+│   ├── business-rules.md
+│   ├── data-model-notes.md
+│   ├── database-governance-standards.md
+│   ├── relationship-validation.md
+│   └── schema-validation.md
 │
-├── database/
-│   ├── 01_schema/
-│   ├── 02_tables/
-│   ├── 03_constraints/
-│   ├── 04_indexes/
-│   ├── 05_seed_data/
-│   └── 06_queries/
+├── sql/
+│   ├── 01_create_schema.sql
+│   ├── 02_seed_sample_data.sql
+│   └── 03_reporting_queries.sql
 │
-├── modelling/
-│   └── erd/
-│
-└── tests/
-    └── validation/
+└── modelling/
+    └── erd/
 
+Query Performance Analysis
 
-## Query Performance Analysis
+Used PostgreSQL EXPLAIN (ANALYZE, BUFFERS) to inspect the execution plan for the application summary report.
 
-Used PostgreSQL `EXPLAIN (ANALYZE, BUFFERS)` to inspect the execution plan for the application summary report.
+Key Observations
 
-Key observations:
-- The query returned all 3 sample applications.
-- Measured execution time was 0.173 ms on the demonstration dataset.
-- PostgreSQL used hash joins to combine related tables.
-- Payment totals and document counts were aggregated separately to avoid inflated totals when multiple related records exist.
-- Sequential scans were selected for the small sample tables, which is reasonable for this dataset.
-- Existing primary-key, unique-constraint, and supporting indexes were inspected before considering additional indexes.
+The query returned all 3 sample applications.
 
-**Limitation:** The dataset is small and synthetic. The measured execution time is a baseline observation, not evidence of performance at production scale. Larger representative datasets and repeatable benchmarks would be needed to evaluate scalability.
+Measured execution time was 0.173 ms on the demonstration dataset.
 
+PostgreSQL used hash joins to combine related tables.
+
+Payment totals and document counts were aggregated separately to prevent inflated totals when multiple related records exist.
+
+PostgreSQL selected sequential scans for the small sample tables, which is reasonable for this dataset.
+
+Existing primary-key, unique-constraint, and supporting indexes were inspected before considering additional indexes.
+
+Limitations
+
+The dataset is small and synthetic. The measured execution time is a baseline observation, not evidence of performance at production scale. Larger representative datasets and repeatable benchmarks would be needed to evaluate scalability.
