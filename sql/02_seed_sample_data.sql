@@ -47,19 +47,18 @@ JOIN users admin
     ON admin.username = 'jlee';
 
 -- =========================================================
--- 4. CITIZENS
--- =========================================================
-
-INSERT INTO citizens (first_name, last_name, date_of_birth)
-VALUES
-    ('Taylor', 'Morgan', DATE '1990-04-12'),
-    ('Riley',  'Singh',  DATE '1985-09-23'),
-    ('Casey',  'Wilson', DATE '2000-01-17');
-
--- =========================================================
+-- 4. CITIZENS 
 -- 5. CITIZEN PROFILES
 -- =========================================================
 
+WITH new_citizens AS (
+    INSERT INTO citizens (first_name, last_name, date_of_birth)
+    VALUES
+        ('Taylor', 'Morgan', DATE '1990-04-12'),
+        ('Riley',  'Singh',  DATE '1985-09-23'),
+        ('Casey',  'Wilson', DATE '2000-01-17')
+    RETURNING citizen_id, first_name, last_name, date_of_birth
+)
 INSERT INTO citizen_profiles (
     citizen_id,
     email_address,
@@ -79,28 +78,30 @@ SELECT
     profile.city,
     profile.province_code,
     profile.postal_code
-FROM (
+FROM new_citizens c
+JOIN (
     VALUES
-        ('Taylor', 'Morgan',
+        ('Taylor', 'Morgan', DATE '1990-04-12',
          'taylor.morgan@example.com', '807-555-0101',
          '100 Demo Street', NULL::text,
          'Thunder Bay', 'ON', 'P7A 1A1'),
-        ('Riley', 'Singh',
+        ('Riley', 'Singh', DATE '1985-09-23',
          'riley.singh@example.com', '807-555-0102',
          '200 Sample Avenue', NULL::text,
          'Thunder Bay', 'ON', 'P7B 2B2'),
-        ('Casey', 'Wilson',
+        ('Casey', 'Wilson', DATE '2000-01-17',
          'casey.wilson@example.com', '807-555-0103',
          '300 Example Road', NULL::text,
          'Thunder Bay', 'ON', 'P7C 3C3')
 ) AS profile(
-    first_name, last_name, email_address, phone_number,
+    first_name, last_name, date_of_birth,
+    email_address, phone_number,
     address_line_1, address_line_2, city,
     province_code, postal_code
 )
-JOIN citizens c
     ON c.first_name = profile.first_name
-   AND c.last_name = profile.last_name;
+   AND c.last_name = profile.last_name
+   AND c.date_of_birth = profile.date_of_birth;
 
 -- =========================================================
 -- 6. APPLICATION TYPES
