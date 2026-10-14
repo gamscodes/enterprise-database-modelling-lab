@@ -132,3 +132,21 @@ Existing primary-key, unique-constraint, and supporting indexes were inspected b
 Limitations
 
 The dataset is small and synthetic. The measured execution time is a baseline observation, not evidence of performance at production scale. Larger representative datasets and repeatable benchmarks would be needed to evaluate scalability.
+
+---
+
+
+## Fresh Database Validation
+
+The schema and seed scripts were tested successfully on a separate, clean PostgreSQL database.
+
+Validation performed:
+- Created all 14 tables and their associated constraints and indexes.
+- Executed the seed script successfully and verified expected row counts across all 14 tables.
+- Confirmed that paid transactions have payment timestamps and pending transactions retain a NULL `paid_at` value.
+- Executed all three reporting queries successfully.
+- Verified six key relationships, with zero orphan records found.
+- Confirmed that the test database could be populated without relying on pre-existing data.
+
+**Result:** All checks passed for the tested sample dataset.
+
