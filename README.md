@@ -108,6 +108,31 @@ enterprise-database-modelling-lab/
 ```
 ---
 
+## Project Artifacts
+
+### Documentation
+- [Business Requirements](docs/business-requirements.md)
+- [Business Rules](docs/business-rules.md)
+- [Data Model Notes](docs/data-model-notes.md)
+- [Data Dictionary](docs/data-dictionary.md)
+- [Database Governance Standards](docs/database-governance-standards.md)
+- [Relationship Validation](docs/relationship-validation.md)
+- [Schema Validation](docs/schema-validation.md)
+- [Schema Change Management](docs/schema-change-management.md)
+
+### SQL Scripts
+- [Create Database Schema](sql/01_create_schema.sql)
+- [Seed Sample Data](sql/02_seed_sample_data.sql)
+- [Reporting Queries](sql/03_reporting_queries.sql)
+
+### Entity Relationship Diagram
+- [ERD Source (DBML)](modelling/erd/enterprise-data-model.dbml)
+- [ERD PDF](modelling/erd/Enterprise%20Citizen%20Licensing%20Database.pdf)
+- [ERD Image (PNG)](modelling/erd/Enterprise%20Citizen%20Licensing%20Database.png)
+- 
+---
+
+
 ## Query Performance Analysis
 
 Used PostgreSQL `EXPLAIN (ANALYZE, BUFFERS)` to inspect the execution plan for the application summary report.
