@@ -129,7 +129,6 @@ enterprise-database-modelling-lab/
 - [ERD Source (DBML)](modelling/erd/enterprise-data-model.dbml)
 - [ERD PDF](modelling/erd/Enterprise%20Citizen%20Licensing%20Database.pdf)
 - [ERD Image (PNG)](modelling/erd/Enterprise%20Citizen%20Licensing%20Database.png)
-- 
 ---
 
 
