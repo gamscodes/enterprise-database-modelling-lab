@@ -26,7 +26,7 @@ The platform supports the complete lifecycle of government licence and permit ap
 This lab demonstrates practical experience across key database engineering and governance domains:
 
 - Enterprise relational database design
-- Data modelling and normalization up to 3NF/BCNF
+- Relational data modelling and normalization principles
 - Database schema design and implementation
 - Data integrity and validation rules
 - Database standards and governance
