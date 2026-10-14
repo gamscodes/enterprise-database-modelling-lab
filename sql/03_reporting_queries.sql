@@ -6,39 +6,44 @@
 
 -- =========================================================
 -- REPORT 1: Application summary
+-- Aggregate payments and documents separately to avoid
+-- multiplying rows when an application has multiple records.
 -- =========================================================
 
+WITH payment_summary AS (
+    SELECT
+        application_id,
+        SUM(amount) FILTER (
+            WHERE payment_status = 'PAID'
+        ) AS total_paid
+    FROM payments
+    GROUP BY application_id
+),
+document_summary AS (
+    SELECT
+        application_id,
+        COUNT(DISTINCT document_id) AS document_count
+    FROM application_documents
+    GROUP BY application_id
+)
 SELECT
     a.application_number,
     c.first_name || ' ' || c.last_name AS citizen_name,
     at.type_name AS application_type,
     a.current_status,
     a.submitted_at,
-    COALESCE(
-        SUM(p.amount) FILTER (
-            WHERE p.payment_status = 'PAID'
-        ), 0
-    ) AS total_paid,
-    COUNT(DISTINCT ad.document_id) AS document_count
+    COALESCE(ps.total_paid, 0) AS total_paid,
+    COALESCE(ds.document_count, 0) AS document_count
 FROM applications a
 JOIN citizens c
     ON c.citizen_id = a.citizen_id
 JOIN application_types at
     ON at.application_type_id = a.application_type_id
-LEFT JOIN payments p
-    ON p.application_id = a.application_id
-LEFT JOIN application_documents ad
-    ON ad.application_id = a.application_id
-GROUP BY
-    a.application_id,
-    a.application_number,
-    c.first_name,
-    c.last_name,
-    at.type_name,
-    a.current_status,
-    a.submitted_at
+LEFT JOIN payment_summary ps
+    ON ps.application_id = a.application_id
+LEFT JOIN document_summary ds
+    ON ds.application_id = a.application_id
 ORDER BY a.application_number;
-
 
 -- =========================================================
 -- REPORT 2: Payment details and reconciliation
