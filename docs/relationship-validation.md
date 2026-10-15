@@ -1,520 +1,413 @@
 # Relationship Validation
 
-> **Portfolio Project:** Citizen Licensing & Permit Management Platform
+> **Portfolio Project:** Citizen Licensing & Permit Management Platform  
+> **Database:** PostgreSQL  
+> **Validation Environment:** `licensing_permit_test`
 
-This document validates the relationships identified during the logical database modelling stage. The relationships are evaluated against the business requirements and business rules to support data integrity, minimize unnecessary duplication, and establish a maintainable relational database design.
+## 1. Purpose
 
----
+This document describes and validates the relationships in the Citizen Licensing & Permit Management Platform. It explains the business purpose of each relationship, its implementation in the relational schema, and the integrity considerations relevant to database design.
 
-## 1. Citizens and Citizen Profiles
+The model separates major business entities to reduce unnecessary duplication, maintain referential integrity, support reporting, and provide a foundation for future workflow and governance requirements.
 
-### Relationship
+The project contains 14 tables:
 
-**One-to-one**
+- `citizens`
+- `citizen_profiles`
+- `application_types`
+- `applications`
+- `application_status_history`
+- `documents`
+- `application_documents`
+- `application_reviews`
+- `application_approvals`
+- `payments`
+- `users`
+- `roles`
+- `user_roles`
+- `audit_logs`
+
+The physical schema has been created and tested in a separate PostgreSQL test database. The relationship checks described in this document cover selected foreign-key relationships and returned zero orphan records for the tested sample dataset.
+
+## 2. Relationship Validation
+
+### 2.1 Citizens and Citizen Profiles
+
+**Relationship:** One-to-one, with an optional profile for a citizen.
 
 ```text
-citizens (1) ───────── (1) citizen_profiles
+citizens (1) ───────── (0..1) citizen_profiles
 ```
 
-### Business Reason
+**Business purpose**
 
-Each citizen may have one profile containing additional contact and address information.
+A citizen may have a separate profile containing additional contact or address information. Separating profile information from the core citizen record keeps the data model organized.
 
-### Database Design
+**Implementation**
 
-`citizen_profiles.citizen_id` will reference `citizens.citizen_id`.
+`citizen_profiles.citizen_id` references `citizens.citizen_id`. The profile's citizen reference is unique, preventing multiple profile records from referencing the same citizen.
 
-The profile identifier will also be unique to ensure that a citizen cannot have multiple active profile records.
+**Integrity considerations**
 
-### Design Rationale
+- A profile must reference an existing citizen.
+- A citizen may exist without a profile.
+- The database prevents multiple profiles from referencing the same citizen.
 
-Core identity information is separated from additional profile information.
+The one-to-one relationship is enforced through the foreign key and uniqueness constraint on the profile's citizen reference.
 
-This keeps the primary citizen entity focused and provides a clear boundary between identity and contact information.
+### 2.2 Citizens and Applications
 
----
-
-## 2. Citizens and Applications
-
-### Relationship
-
-**One-to-many**
+**Relationship:** One-to-many.
 
 ```text
 citizens (1) ───────── (many) applications
 ```
 
-### Business Reason
+**Business purpose**
 
 A citizen may submit multiple applications, while each application belongs to one citizen.
 
-### Database Design
+**Implementation**
 
-`applications.citizen_id` will reference `citizens.citizen_id`.
+`applications.citizen_id` references `citizens.citizen_id`.
 
-### Normalization Rationale
+**Integrity considerations**
 
-Citizen information should not be duplicated within every application.
+- Each application must reference an existing citizen.
+- Citizen information is stored once in the citizen record rather than duplicated across applications.
+- The foreign key enforces referential integrity.
 
-If one citizen submits five applications, the database should maintain one citizen record and five application records referencing that citizen.
+This design reduces duplication and supports consistent reporting across applications belonging to the same citizen.
 
-This reduces duplication and supports maintainability.
+### 2.3 Application Types and Applications
 
-### Integrity Rule
-
-An application must not reference a citizen that does not exist.
-
-A foreign key will enforce this relationship.
-
----
-
-## 3. Application Types and Applications
-
-### Relationship
-
-**One-to-many**
+**Relationship:** One-to-many.
 
 ```text
 application_types (1) ───────── (many) applications
 ```
 
-### Business Reason
+**Business purpose**
 
-The platform supports multiple licence and permit types.
+The platform supports different licence and permit application types. One application type may be referenced by many applications, while each application references one type.
 
-One application type may be used by many applications, while each application must reference one valid application type.
+**Implementation**
 
-### Database Design
+`applications.application_type_id` references `application_types.application_type_id`. The application type's `type_code` has a uniqueness requirement.
 
-`applications.application_type_id` will reference `application_types.application_type_id`.
+**Integrity considerations**
 
-### Normalization Rationale
+- Each application must reference an existing application type.
+- Unique type codes support consistent identification of application types.
+- Storing type information separately reduces repeated descriptive data.
 
-Application type information should be stored once in `application_types` rather than repeatedly as free-text values in `applications`.
+The relationship supports consistent classification and reporting without relying on free-text application type values in every application record.
 
-This provides:
+### 2.4 Applications and Application Status History
 
-* Consistent application type values
-* Reduced duplication
-* Easier maintenance
-* Better reporting
-* Referential integrity
-
-### Integrity Rule
-
-Every application must reference an existing application type.
-
-`application_types.type_code` should also be unique.
-
----
-
-## 4. Applications and Application Status History
-
-### Relationship
-
-**One-to-many**
+**Relationship:** One-to-many.
 
 ```text
 applications (1) ───────── (many) application_status_history
 ```
 
-### Business Reason
+**Business purpose**
 
-An application can move through multiple stages during its lifecycle.
+An application may pass through multiple lifecycle stages. Retaining status history makes it possible to examine recorded transitions rather than relying only on the current status.
 
-For example:
+**Implementation**
 
-```text
-Submitted
-    ↓
-Under Review
-    ↓
-Additional Information Required
-    ↓
-Under Review
-    ↓
-Approved
-```
+`application_status_history.application_id` references `applications.application_id`.
 
-Each transition should be retained.
+Status history records include the status and the associated change information, including a timestamp and an actor reference where applicable.
 
-### Database Design
+**Integrity considerations**
 
-`application_status_history.application_id` will reference `applications.application_id`.
+- Each status history record must reference an existing application.
+- Status history is stored separately from the application's current status.
+- The history supports traceability of recorded status changes.
 
-### Design Rationale
+A separate history table does not, by itself, guarantee that every application status update creates a corresponding history record. Complete and consistent history capture requires appropriate application workflow or database-side enforcement.
 
-The current application status alone is insufficient to reconstruct the application's history.
+### 2.5 Applications and Documents
 
-A separate history table preserves every status change as an individual event.
-
-### Integrity Rule
-
-A status history record must belong to an existing application.
-
-### Auditability
-
-Each status history record should identify:
-
-* The status
-* The timestamp
-* The user or process responsible
-* Optional comments or reason
-
----
-
-## 5. Applications and Documents
-
-### Relationship
-
-**Many-to-many**
+**Relationship:** Many-to-many, implemented through an association table.
 
 ```text
-applications (many) ───────── (many) documents
-                 │
-                 │
-                 └── application_documents
+applications (1) ── (many) application_documents (many) ── (1) documents
 ```
 
-### Business Reason
+**Business purpose**
 
-An application may require multiple supporting documents.
+An application may require multiple supporting documents. The association model also allows a document record to be linked to more than one application if the business process permits it.
 
-A document relationship may also need to support reuse or association with different application records depending on future business requirements.
+**Implementation**
 
-### Database Design
+The `application_documents` table links applications and documents through:
 
-The many-to-many relationship will be implemented through:
+- `application_id`
+- `document_id`
+- `document_purpose`
 
-```text
-application_documents
-```
+The application reference points to `applications.application_id`, and the document reference points to `documents.document_id`.
 
-This association entity will contain:
+**Integrity considerations**
 
-* `application_id`
-* `document_id`
-* `document_purpose`
+- Each association must reference an existing application.
+- Each association must reference an existing document.
+- Relationship-specific information, such as document purpose, belongs in the association table.
 
-### Design Rationale
+The model stores document metadata and a file reference in the database. Storage of the actual binary document content is outside the scope of this schema.
 
-Using an association entity prevents document information from being duplicated within application records.
+### 2.6 Applications and Reviews
 
-It also provides a place to store attributes that belong specifically to the relationship between an application and a document.
-
----
-
-## 6. Applications and Reviews
-
-### Relationship
-
-**One-to-many**
+**Relationship:** One-to-many.
 
 ```text
 applications (1) ───────── (many) application_reviews
 ```
 
-### Business Reason
+**Business purpose**
 
-An application may require multiple review activities during its lifecycle.
+An application may have multiple review activities, potentially involving different reviewers at different stages.
 
-Different reviewers may participate in reviewing the same application.
+**Implementation**
 
-### Database Design
+- `application_reviews.application_id` references `applications.application_id`.
+- `application_reviews.reviewer_user_id` references `users.user_id`.
 
-`application_reviews.application_id` will reference `applications.application_id`.
+**Integrity considerations**
 
-`application_reviews.reviewer_user_id` will reference `users.user_id`.
+- Each review must reference an existing application.
+- Each review's reviewer reference must identify an existing user.
+- Review information is maintained separately from the application record.
 
-### Design Rationale
+Keeping review records separate supports review history and reporting. The foreign keys establish valid references but do not independently verify that a reviewer is authorized to review a particular application.
 
-Review activity is kept separate from the application itself because review events contain their own:
+### 2.7 Applications and Approval Decisions
 
-* Reviewer
-* Status
-* Timestamp
-* Comments
-
-This allows the system to maintain a history of review activity.
-
----
-
-## 7. Applications and Approval Decisions
-
-### Relationship
-
-**One-to-many**
+**Relationship:** One-to-many.
 
 ```text
 applications (1) ───────── (many) application_approvals
 ```
 
-### Business Reason
+**Business purpose**
 
-The platform must support formal approval and rejection decisions.
+Formal approval decisions are distinct from review activities. The model supports approval, rejection, and return decisions and can accommodate multiple approval records where the workflow requires them.
 
-The design allows multiple approval records if a future workflow introduces multiple approval stages.
+**Implementation**
 
-### Database Design
+- `application_approvals.application_id` references `applications.application_id`.
+- `application_approvals.approver_user_id` references `users.user_id`.
+- The decision column has a check constraint permitting `APPROVED`, `REJECTED`, and `RETURNED`.
 
-`application_approvals.application_id` will reference `applications.application_id`.
+**Integrity considerations**
 
-`application_approvals.approver_user_id` will reference `users.user_id`.
+- Each approval record must reference an existing application.
+- The approver reference must identify an existing user.
+- The decision must satisfy the implemented check constraint.
 
-### Design Rationale
+The foreign keys and decision constraint enforce structural integrity. Workflow requirements such as approver authorization, approval sequencing, and whether multiple decisions are permitted for a particular application require additional business-process enforcement.
 
-A review is not necessarily the same as a formal approval decision.
+### 2.8 Applications and Payments
 
-Separating reviews from approvals allows the database to distinguish:
-
-**Review activity**
-
-from:
-
-**Formal business decision**
-
-This improves auditability and supports future workflow expansion.
-
----
-
-## 8. Applications and Payments
-
-### Relationship
-
-**One-to-many**
+**Relationship:** One-to-many.
 
 ```text
 applications (1) ───────── (many) payments
 ```
 
-### Business Reason
+**Business purpose**
 
-An application may require a payment and may potentially have multiple payment-related transactions, such as an initial payment, adjustment, refund, or correction.
+An application may be associated with one or more payment-related transactions. Keeping payment records separate supports transaction-level reporting and preserves payment information independently of the application record.
 
-### Database Design
+**Implementation**
 
-`payments.application_id` will reference `applications.application_id`.
+`payments.application_id` references `applications.application_id`.
 
-### Design Rationale
+The payment amount has a non-negative check constraint. The payment status field has a nonblank-value check, but the schema does not currently enforce a complete list of permitted payment status values.
 
-Payment information represents a financial transaction and should not be embedded directly into the application record.
+**Integrity considerations**
 
-Separating payments allows the database to maintain transaction history independently.
+- Each payment must reference an existing application.
+- Payment amounts must satisfy the implemented non-negative constraint.
+- `paid_at` may be null, including for a payment that has not yet been paid.
+- Payment status values should be governed by a defined set of permitted values in a future schema or application enhancement.
 
-### Integrity Rules
+A non-negative amount constraint does not validate whether a charge, refund, adjustment, or payment is financially correct. Those rules require additional business validation.
 
-A payment must reference an existing application.
+### 2.9 Users and Roles
 
-Payment amounts must satisfy the defined business validation rules.
-
-Payment status values should be controlled.
-
----
-
-## 9. Users and Roles
-
-### Relationship
-
-**Many-to-many**
+**Relationship:** Many-to-many, implemented through an association table.
 
 ```text
-users (many) ───────── (many) roles
-             │
-             │
-             └── user_roles
+users (1) ───────── (many) user_roles (many) ───────── (1) roles
 ```
 
-### Business Reason
+**Business purpose**
 
-A user may have multiple responsibilities.
+A user may have multiple responsibilities, and each role may be assigned to multiple users.
 
-For example, one employee could potentially be both:
+**Implementation**
 
-* Application Reviewer
-* Reporting User
+The `user_roles` table connects users and roles through `user_id` and `role_id`. The association also records assignment-related information.
 
-At the same time, a role may be assigned to many users.
+**Integrity considerations**
 
-### Database Design
+- Each user-role association must reference an existing user.
+- Each user-role association must reference an existing role.
+- A composite uniqueness constraint on `(user_id, role_id)` prevents the same role from being assigned to the same user more than once.
 
-The many-to-many relationship will be implemented through:
+The `users`, `roles`, and `user_roles` tables provide a data model for application-level role assignments. They are not equivalent to PostgreSQL database roles or database privilege grants.
 
-```text
-user_roles
-```
+### 2.10 Users and Application Reviews
 
-The association will contain:
-
-* `user_id`
-* `role_id`
-* `assigned_at`
-* `assigned_by_user_id`
-
-### Design Rationale
-
-Using a junction table avoids storing multiple roles in a single user record and provides a scalable foundation for role-based access control.
-
-### Integrity Rule
-
-The same role should not be assigned to the same user more than once.
-
-A composite uniqueness rule will be considered for:
-
-```text
-user_id + role_id
-```
-
----
-
-## 10. Users and Application Reviews
-
-### Relationship
-
-**One-to-many**
+**Relationship:** One-to-many.
 
 ```text
 users (1) ───────── (many) application_reviews
 ```
 
-### Business Reason
+**Business purpose**
 
-One authorized user may review many applications.
+A user may perform multiple reviews, and each review identifies its reviewer.
 
-Each review should identify the user who performed the review.
+**Implementation**
 
-### Database Design
+`application_reviews.reviewer_user_id` references `users.user_id`.
 
-`application_reviews.reviewer_user_id` will reference `users.user_id`.
+**Integrity considerations**
 
-### Design Rationale
+The foreign key prevents a review from referencing a user record that does not exist. It does not, on its own, establish that the user has the appropriate role or permissions to perform the review.
 
-Referencing the user rather than storing the reviewer's name directly prevents duplication and preserves a consistent relationship to the system user.
+### 2.11 Users and Application Approvals
 
----
-
-## 11. Users and Application Approvals
-
-### Relationship
-
-**One-to-many**
+**Relationship:** One-to-many.
 
 ```text
 users (1) ───────── (many) application_approvals
 ```
 
-### Business Reason
+**Business purpose**
 
-An authorized user may make approval decisions for multiple applications.
+A user may make approval decisions for multiple applications. Each approval record identifies the associated approver.
 
-### Database Design
+**Implementation**
 
-`application_approvals.approver_user_id` will reference `users.user_id`.
+`application_approvals.approver_user_id` references `users.user_id`.
 
-### Design Rationale
+**Integrity considerations**
 
-The approval record identifies the user responsible for the decision, supporting accountability and auditability.
+The foreign key supports accountability by maintaining a reference to the user associated with each approval. Authorization and approval-workflow rules require additional enforcement.
 
----
+### 2.12 Users and Status History
 
-## 12. Users and Status History
-
-### Relationship
-
-**One-to-many**
+**Relationship:** One-to-many, where the status change is attributed to a user.
 
 ```text
 users (1) ───────── (many) application_status_history
 ```
 
-### Business Reason
+**Business purpose**
 
-A user or authorized system process may perform multiple application status changes.
+A user may be responsible for multiple application status changes. Recording the actor supports operational traceability.
 
-### Database Design
+**Implementation**
 
-`application_status_history.changed_by_user_id` will reference `users.user_id` where the change is attributable to a user.
+`application_status_history.changed_by_user_id` references `users.user_id` where the change is attributable to a user.
 
-### Design Rationale
+**Integrity considerations**
 
-Recording the actor responsible for a status change supports operational traceability and audit requirements.
+The user reference must satisfy the schema's foreign-key and nullability rules. System-generated changes and changes without an identified individual must be handled according to the implemented column definition and application workflow.
 
----
+### 2.13 Users and Audit Logs
 
-## 13. Users and Audit Logs
-
-### Relationship
-
-**One-to-many**
+**Relationship:** One-to-many.
 
 ```text
 users (1) ───────── (many) audit_logs
 ```
 
-### Business Reason
+**Business purpose**
 
-A user may perform many auditable actions.
+A user may be associated with multiple auditable events. Audit records support troubleshooting, accountability, and investigation.
 
-Each applicable audit event should identify the user responsible.
+**Implementation**
 
-### Database Design
+`audit_logs.user_id` references `users.user_id`.
 
-`audit_logs.user_id` will reference `users.user_id`.
+**Integrity considerations**
 
-The design should also allow system-generated events where no individual user is responsible.
+The foreign key maintains referential integrity for recorded user references. The existence of an audit table does not by itself guarantee comprehensive event capture, tamper resistance, or complete security monitoring.
 
-### Design Rationale
+## 3. Relationship Summary
 
-Audit logging supports accountability, troubleshooting, security monitoring, and investigation.
+| Parent entity | Child entity | Relationship | Implementation |
+|---|---|---|---|
+| `citizens` | `citizen_profiles` | 1:0..1 | Foreign key and unique constraint |
+| `citizens` | `applications` | 1:M | Foreign key |
+| `application_types` | `applications` | 1:M | Foreign key and unique type code |
+| `applications` | `application_status_history` | 1:M | Foreign key |
+| `applications` | `application_documents` | 1:M | Foreign key |
+| `documents` | `application_documents` | 1:M | Foreign key |
+| `applications` | `application_reviews` | 1:M | Foreign key |
+| `users` | `application_reviews` | 1:M | Foreign key |
+| `applications` | `application_approvals` | 1:M | Foreign key |
+| `users` | `application_approvals` | 1:M | Foreign key |
+| `applications` | `payments` | 1:M | Foreign key |
+| `users` | `user_roles` | 1:M | Foreign key |
+| `roles` | `user_roles` | 1:M | Foreign key |
+| `users` | `application_status_history` | 1:M | Foreign key |
+| `users` | `audit_logs` | 1:M | Foreign key |
 
----
+The many-to-many relationships between applications and documents, and between users and roles, are implemented using their respective association tables.
 
-# 14. Relationship Summary
+## 4. Normalization Assessment
 
-| Parent Entity       | Child Entity                 | Relationship | Implementation                  |
-| ------------------- | ---------------------------- | ------------ | ------------------------------- |
-| `citizens`          | `citizen_profiles`           | 1:1          | Foreign key + unique constraint |
-| `citizens`          | `applications`               | 1:M          | Foreign key                     |
-| `application_types` | `applications`               | 1:M          | Foreign key                     |
-| `applications`      | `application_status_history` | 1:M          | Foreign key                     |
-| `applications`      | `application_documents`      | 1:M          | Foreign key                     |
-| `documents`         | `application_documents`      | 1:M          | Foreign key                     |
-| `applications`      | `application_reviews`        | 1:M          | Foreign key                     |
-| `applications`      | `application_approvals`      | 1:M          | Foreign key                     |
-| `applications`      | `payments`                   | 1:M          | Foreign key                     |
-| `users`             | `user_roles`                 | 1:M          | Foreign key                     |
-| `roles`             | `user_roles`                 | 1:M          | Foreign key                     |
-| `users`             | `application_reviews`        | 1:M          | Foreign key                     |
-| `users`             | `application_approvals`      | 1:M          | Foreign key                     |
-| `users`             | `application_status_history` | 1:M          | Foreign key                     |
-| `users`             | `audit_logs`                 | 1:M          | Foreign key                     |
+The model separates major business concepts into distinct tables and avoids storing repeating groups or unrelated transactional attributes together.
 
----
+Examples include:
 
-# 15. Overall Normalization Assessment
+- Citizens are separated from applications.
+- Applications reference application types rather than duplicating type details.
+- Application status history is separated from the current application record.
+- Application-document associations are maintained through a junction table.
+- Reviews are separated from formal approval decisions.
+- Payments are maintained independently of applications.
+- User-role assignments are maintained through a junction table.
+- Audit records are separated from operational records.
 
-The current logical model separates major business concepts into distinct entities and avoids storing repeating groups or unrelated attributes within transactional records.
+These design decisions support a normalized relational structure and reduce unnecessary duplication. The final quality of normalization also depends on the functional dependencies and business rules applicable to the data.
 
-The design specifically separates:
+Normalization does not replace the need for primary keys, foreign keys, uniqueness constraints, check constraints, appropriate data types, and indexes.
 
-* Citizens from applications
-* Applications from application types
-* Current application state from status history
-* Applications from supporting documents
-* Review activities from approval decisions
-* Applications from financial transactions
-* Users from roles
-* Operational records from audit records
+## 5. Relationship Validation Results
 
-These design choices provide a foundation for a normalized relational model and reduce unnecessary data duplication.
+The schema and sample data were tested in the separate PostgreSQL database `licensing_permit_test`.
 
-The model will be reviewed again during physical schema design to identify additional normalization opportunities and determine appropriate primary keys, foreign keys, constraints, indexes, and data types.
+The following integrity checks were run against the tested sample dataset:
 
-# 16. Design Review Status
+| Validation check | Expected result | Observed result |
+|---|---|---|
+| Citizen profiles without matching citizens | 0 orphan records | 0 |
+| Applications without matching citizens | 0 orphan records | 0 |
+| Applications without matching application types | 0 orphan records | 0 |
+| Payments without matching applications | 0 orphan records | 0 |
+| Application-document associations without matching applications | 0 orphan records | 0 |
+| Application-document associations without matching documents | 0 orphan records | 0 |
 
-**Logical relationship review:** Complete
+**Validation outcome:** All six tested relationship checks returned zero orphan records.
 
-**Normalization review:** Initial assessment complete
+These results confirm referential consistency for the tested relationships and sample dataset. They do not independently prove that every business rule, workflow, authorization requirement, or possible production data condition has been validated.
 
-**Physical database implementation:** Not yet started
+## 6. Limitations and Future Enhancements
 
-**ERD:** To be created after logical relationship validation
+The following items may require additional implementation as the platform evolves:
+
+- **Status history:** Ensure each relevant status change is consistently recorded through application logic or database-side enforcement.
+- **Payment statuses:** Define and enforce the complete set of permitted payment status values.
+- **Review and approval authorization:** Validate that users have the appropriate permissions before performing restricted actions.
+- **Audit coverage:** Define which events must be captured and how audit records will be protected and retained.
+- **Workflow rules:** Define approval sequencing, repeated decisions, and status-transition requirements.
+- **Document storage:** Define secure storage, access, retention, and retrieval
